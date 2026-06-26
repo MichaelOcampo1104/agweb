@@ -1,0 +1,9 @@
+# Python scrapers for the Halal Manufacturers directory
+# Install into a venv:  python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt
+httpx==0.27.2
+beautifulsoup4==4.12.3
+pdfplumber==0.11.4
+supabase==2.9.1
+python-dotenv==1.0.1
+typer==0.13.1
+click==8.1.8
