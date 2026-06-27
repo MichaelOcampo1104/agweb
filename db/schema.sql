@@ -24,7 +24,7 @@ create extension if not exists "unaccent";       -- accent-insensitive search
 create table if not exists public.certification_bodies (
     id              uuid primary key default gen_random_uuid(),
     name            text not null,
-    slug            text generated always as (lower(regexp_replace(unaccent(name), '[^a-z0-9]+', '-', 'g')), '-') stored,
+    slug            text not null,
     country         text,
     region          text,
     website         text,
@@ -40,6 +40,19 @@ create table if not exists public.certification_bodies (
     updated_at      timestamptz not null default now(),
     unique (name, country)
 );
+
+-- Trigger: auto-generate slug from name on insert/update
+create or replace function public.generate_cb_slug()
+returns trigger language plpgsql as $$
+begin
+    new.slug = lower(regexp_replace(unaccent(new.name), '[^a-z0-9]+', '-', 'g'));
+    return new;
+end;
+$$;
+
+drop trigger if exists trg_cb_slug on public.certification_bodies;
+create trigger trg_cb_slug before insert or update of name on public.certification_bodies
+    for each row execute function public.generate_cb_slug();
 
 -- ----------------------------------------------------------------------------
 -- 2) Manufacturers  (the core product of the directory)
@@ -76,17 +89,27 @@ create table if not exists public.manufacturers (
     unique (name, country)
 );
 
--- Generated full-text search vector across the searchable columns.
--- Coalesce handles NULLs so the vector is always well-formed.
+-- Full-text search vector (populated by trigger — not a generated column
+-- because unaccent() is STABLE, not IMMUTABLE).
 alter table public.manufacturers
-    add column if not exists search_vector tsvector
-    generated always as (
-        setweight(to_tsvector('simple', unaccent(coalesce(name, ''))), 'A') ||
-        setweight(to_tsvector('simple', unaccent(coalesce(city, ''))), 'B') ||
-        setweight(to_tsvector('simple', unaccent(coalesce(country, ''))), 'B') ||
-        setweight(to_tsvector('simple', unaccent(coalesce(array_to_string(industries, ' '), ''))), 'C') ||
-        setweight(to_tsvector('simple', unaccent(coalesce(array_to_string(products, ' '), ''))), 'C')
-    ) stored;
+    add column if not exists search_vector tsvector;
+
+create or replace function public.generate_mfr_search_vector()
+returns trigger language plpgsql as $$
+begin
+    new.search_vector =
+        setweight(to_tsvector('simple', unaccent(coalesce(new.name, ''))), 'A') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.city, ''))), 'B') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.country, ''))), 'B') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(array_to_string(new.industries, ' '), ''))), 'C') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(array_to_string(new.products, ' '), ''))), 'C');
+    return new;
+end;
+$$;
+
+drop trigger if exists trg_mfr_search_vector on public.manufacturers;
+create trigger trg_mfr_search_vector before insert or update of name, city, country, industries, products on public.manufacturers
+    for each row execute function public.generate_mfr_search_vector();
 
 -- Indexes for the directory's filters, search, and ordering
 create index if not exists manufacturers_search_idx    on public.manufacturers using gin (search_vector);

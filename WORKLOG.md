@@ -2,7 +2,7 @@
 
 > Source of truth for project status. Read this first when resuming.
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-06-27
 **Repo:** https://github.com/MichaelOcampo1104/agweb (public, main branch, in sync)
 **Project:** Global Halal-Certified Manufacturers aggregator
 
@@ -19,52 +19,27 @@
      - CLI runner (`run`, `list-scrapers`, `--dry-run`, `--all`) all verified
 2. **Pushed to GitHub** — https://github.com/MichaelOcampo1104/agweb (public)
 3. **Docs complete** — `README.md` (GitHub-ready, badges/roadmap), `AGENTS.md` (architecture + expansion guide), `LICENSE` (MIT)
+4. **Supabase project connected** — `yksuckngzyklqlhqjxru` with `db/schema.sql` applied
+5. **Schema fix applied** — generated columns (`certification_bodies.slug`, `manufacturers.search_vector`) converted to trigger-based because `unaccent()` is STABLE not IMMUTABLE in PostgreSQL
+6. **`.env` created** — all 5 vars set (Supabase URL, anon key, service role key, site URL)
+7. **Local run verified** — `npm run dev` → all pages respond HTTP 200 (homepage, /manufacturers, /certifiers)
 
-## ⛔ Current blocker — the site is NOT live
+## 🔜 Next steps
 
-Pushing code to GitHub does **not** deploy a website. The app currently:
-- Has **no `.env` file** (cannot connect to any database)
-- Has **no Supabase project** (no data source exists)
-- Is **not running** anywhere — not locally, not on the internet
+### Step 1 — Populate data (optional but recommended before deploy)
+- [ ] `cd scrapers && python run_scrapers.py run --all` to seed certifier data
+- [ ] Homepage stats will show real numbers instead of zeros
 
-So: there is nothing to visit yet. Both local run and live deploy share the same first step.
-
-## 🔜 Next steps (in order) — this is where work resumes
-
-The 3 prerequisites before the site can run at all:
-
-### Step 1 — Create the Supabase project (blocks everything)
-- [ ] Sign up at [supabase.com](https://supabase.com) (free; GitHub login works) → **New project**
-- [ ] Open **SQL Editor → New query** → paste all of `db/schema.sql` → **Run**
-- [ ] In **Project Settings → API**, collect these 3 values:
-  - `Project URL`
-  - `anon public` key
-  - `service_role` key
-
-### Step 2 — Create `.env` at repo root (from `.env.example`)
-- [ ] Fill in the 3 values from Step 1
-- [ ] Set `NEXT_PUBLIC_SITE_URL` (localhost for local run, real domain for deploy)
-
-### Step 3 — Run the site (choose ONE)
-
-**Path A — Local only (you can see it on http://localhost:3000):**
-- [ ] `npm run dev`
-- [ ] Optionally populate certifier data: `cd scrapers && python run_scrapers.py run --all`
-
-**Path B — Live on the internet (anyone can visit):**
-- [ ] Import the GitHub repo into **Vercel** (vercel.com → New Project → pick `agweb`)
-- [ ] Add the same env vars in Vercel's project settings
-- [ ] Vercel returns a live `https://agweb-xxx.vercel.app` URL
+### Step 2 — Deploy to Vercel
+- [ ] Import repo into Vercel (vercel.com → New Project → `MichaelOcampo1104/agweb`)
+- [ ] Add env vars in Vercel project settings (copy from `.env`)
+- [ ] Deploy → get live URL → update `NEXT_PUBLIC_SITE_URL` to match
 
 ---
 
 ## 🔁 How to resume (copy-paste this to the agent)
 
-> "Resume the agweb project. Read WORKLOG.md. I've completed Supabase setup —
-> here are my values: [paste Project URL, anon key, service key]. Create the
-> `.env` and get the site running."
-
-Or: "I created the Supabase project and applied db/schema.sql. Help me deploy to Vercel."
+> "Resume the agweb project. Read WORKLOG.md. Help me deploy to Vercel."
 
 ---
 
