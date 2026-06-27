@@ -6,7 +6,7 @@ import { createClient } from "@/lib/server";
  * SEO is the primary traffic channel, so this is wired up from the start.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://halaldirectory.example";
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${base}/`, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },

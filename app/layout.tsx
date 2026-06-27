@@ -4,7 +4,11 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://halaldirectory.example"),
+  // Drives absolute URLs (canonical, OpenGraph images) for every route.
+  // Falls back to localhost so local dev never throws on a missing env var.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  ),
   title: {
     default: "Halal Directory — Global Halal-Certified Manufacturers & Certifiers",
     template: "%s | Halal Directory",
