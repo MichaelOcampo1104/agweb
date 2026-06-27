@@ -155,6 +155,87 @@ create table if not exists public.scrape_runs (
 );
 
 -- ----------------------------------------------------------------------------
+-- 5) Infrastructure projects  (Singapore project pipeline for B2B contractors)
+--    Tracks government infrastructure projects across agencies — rail, roads,
+--    housing, utilities, and commercial development. Source: data.gov.sg APIs.
+-- ----------------------------------------------------------------------------
+create table if not exists public.infrastructure_projects (
+    id                uuid primary key default gen_random_uuid(),
+    name              text not null,
+    slug              text not null,
+    agency            text not null,         -- HDB, LTA, URA, PUB, JTC, etc.
+    project_type      text,                  -- rail, road, housing, water, commercial, etc.
+    status            text not null default 'proposed',  -- proposed | planning | tendering | under_construction | completed
+    description       text,
+    budget            numeric(14, 2),        -- in SGD
+    contractor_name   text,
+    contractor_contact text,
+    location          text,                  -- street, district, or region
+    start_date        date,
+    expected_completion text,                -- free-text e.g. "3Q 2026" (many gov datasets use quarter format)
+    actual_completion  date,
+    source            text not null,         -- scraper that produced this row
+    source_url        text not null,
+    raw_payload       jsonb,
+    created_at        timestamptz not null default now(),
+    updated_at        timestamptz not null default now(),
+    unique (name, agency)
+);
+
+-- Trigger: auto-generate slug from name on insert/update
+create or replace function public.generate_infra_slug()
+returns trigger language plpgsql as $$
+begin
+    new.slug = lower(regexp_replace(unaccent(new.name), '[^a-z0-9]+', '-', 'g'));
+    return new;
+end;
+$$;
+
+drop trigger if exists trg_infra_slug on public.infrastructure_projects;
+create trigger trg_infra_slug before insert or update of name on public.infrastructure_projects
+    for each row execute function public.generate_infra_slug();
+
+-- Full-text search on infrastructure projects
+alter table public.infrastructure_projects
+    add column if not exists search_vector tsvector;
+
+create or replace function public.generate_infra_search_vector()
+returns trigger language plpgsql as $$
+begin
+    new.search_vector =
+        setweight(to_tsvector('simple', unaccent(coalesce(new.name, ''))), 'A') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.description, ''))), 'B') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.agency, ''))), 'B') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.contractor_name, ''))), 'C') ||
+        setweight(to_tsvector('simple', unaccent(coalesce(new.location, ''))), 'C');
+    return new;
+end;
+$$;
+
+drop trigger if exists trg_infra_search_vector on public.infrastructure_projects;
+create trigger trg_infra_search_vector before insert or update of name, description, agency, contractor_name, location on public.infrastructure_projects
+    for each row execute function public.generate_infra_search_vector();
+
+create index if not exists infra_search_idx     on public.infrastructure_projects using gin (search_vector);
+create index if not exists infra_agency_idx     on public.infrastructure_projects (agency);
+create index if not exists infra_status_idx     on public.infrastructure_projects (status);
+create index if not exists infra_type_idx       on public.infrastructure_projects (project_type);
+create index if not exists infra_slug_idx       on public.infrastructure_projects (slug);
+
+--- RLS
+alter table public.infrastructure_projects enable row level security;
+
+drop policy if exists "infra_public_read" on public.infrastructure_projects;
+create policy "infra_public_read"
+    on public.infrastructure_projects for select
+    to anon, authenticated using (true);
+
+-- updated_at trigger
+drop trigger if exists trg_infra_updated on public.infrastructure_projects;
+create trigger trg_infra_updated before update on public.infrastructure_projects
+    for each row execute function public.touch_updated_at();
+
+-- ----------------------------------------------------------------------------
 -- updated_at triggers
 -- ----------------------------------------------------------------------------
 create or replace function public.touch_updated_at()

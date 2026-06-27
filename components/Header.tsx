@@ -17,6 +17,9 @@ export function Header() {
           <Link href="/certifiers" className="hover:text-brand-700">
             Certifiers
           </Link>
+          <Link href="/infrastructure" className="hover:text-blue-700">
+            Infrastructure
+          </Link>
           <Link
             href="/leads/new"
             className="rounded-lg bg-brand-600 px-3 py-2 text-white hover:bg-brand-700"

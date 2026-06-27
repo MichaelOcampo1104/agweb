@@ -148,6 +148,52 @@ export interface Database {
         Insert: Partial<Database["public"]["Tables"]["scrape_runs"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["scrape_runs"]["Insert"]>;
       };
+      infrastructure_projects: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          agency: string;
+          project_type: string | null;
+          status: string;
+          description: string | null;
+          budget: number | null;
+          contractor_name: string | null;
+          contractor_contact: string | null;
+          location: string | null;
+          start_date: string | null;
+          expected_completion: string | null;
+          actual_completion: string | null;
+          source: string;
+          source_url: string;
+          raw_payload: Json | null;
+          search_vector: unknown;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          agency: string;
+          project_type?: string | null;
+          status?: string;
+          description?: string | null;
+          budget?: number | null;
+          contractor_name?: string | null;
+          contractor_contact?: string | null;
+          location?: string | null;
+          start_date?: string | null;
+          expected_completion?: string | null;
+          actual_completion?: string | null;
+          source: string;
+          source_url: string;
+          raw_payload?: Json | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["infrastructure_projects"]["Insert"]
+        >;
+      };
     };
     Views: {
       directory_stats: {

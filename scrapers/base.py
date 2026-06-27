@@ -100,12 +100,19 @@ class BaseScraper:
         Default: do nothing."""
         return None
 
+    @property
+    def conflict_columns(self) -> str:
+        """Columns that form the UNIQUE constraint for upsert (comma-separated).
+        Override in subclasses whose table has a different unique key."""
+        return "name,country"
+
     # -------------------------------------------------------------- upserting
     def _dedupe_key(self, row: dict[str, Any]) -> dict[str, Any]:
         """Columns that uniquely identify a row (must match a UNIQUE constraint)."""
-        if self.target_table == "certification_bodies":
-            return {"name": row["name"], "country": row.get("country")}
-        return {"name": row["name"], "country": row["country"]}
+        return {
+            col.strip(): row[col.strip()]
+            for col in self.conflict_columns.split(",")
+        }
 
     def upsert(self, rows: Iterable[dict[str, Any]]) -> int:
         """Upsert rows into the target table, returning the count written."""
@@ -113,9 +120,8 @@ class BaseScraper:
         if not rows:
             return 0
         table = self.client.table(self.target_table)
-        # on_conflict matches the natural unique constraint on each table
         res = table.upsert(
-            rows, on_conflict="name,country"
+            rows, on_conflict=self.conflict_columns
         ).execute()
         return len(res.data or [])
 

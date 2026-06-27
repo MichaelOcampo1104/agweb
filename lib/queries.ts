@@ -157,3 +157,84 @@ export async function getCertBodyCountries() {
   (data ?? []).forEach((r: { country: string | null }) => r.country && set.add(r.country));
   return [...set].sort();
 }
+
+// ---------------------------------------------------------------------------
+// Infrastructure projects (Singapore pipeline)
+// ---------------------------------------------------------------------------
+
+export type InfraProject = Database["public"]["Tables"]["infrastructure_projects"]["Row"];
+
+export type InfraFilters = {
+  q?: string;
+  agency?: string;
+  project_type?: string;
+  status?: string;
+  page?: number;
+};
+
+export const INFRA_PAGE_SIZE = 24;
+
+export async function getInfraFilterOptions() {
+  const supabase = await createClient();
+
+  const [agencies, types] = await Promise.all([
+    supabase.from("infrastructure_projects").select("agency").order("agency"),
+    supabase.from("infrastructure_projects").select("project_type"),
+  ]);
+
+  const agencySet = new Set<string>();
+  (agencies.data ?? []).forEach((r: { agency: string }) => agencySet.add(r.agency));
+
+  const typeSet = new Set<string>();
+  (types.data ?? []).forEach((r: { project_type: string | null }) => {
+    if (r.project_type) typeSet.add(r.project_type);
+  });
+
+  return {
+    agencies: [...agencySet].sort(),
+    projectTypes: [...typeSet].sort(),
+  };
+}
+
+export async function getInfraProjects(filters: InfraFilters = {}) {
+  const supabase = await createClient();
+  const page = Math.max(1, filters.page ?? 1);
+  const from = (page - 1) * INFRA_PAGE_SIZE;
+  const to = from + INFRA_PAGE_SIZE - 1;
+
+  let query = supabase
+    .from("infrastructure_projects")
+    .select("*", { count: "exact" })
+    .order("status", { ascending: true })
+    .order("name", { ascending: true })
+    .range(from, to);
+
+  if (filters.q) {
+    const term = filters.q.trim().replace(/\s+/g, " & ");
+    query = query.textSearch("search_vector", term);
+  }
+  if (filters.agency) query = query.eq("agency", filters.agency);
+  if (filters.project_type) query = query.eq("project_type", filters.project_type);
+  if (filters.status) query = query.eq("status", filters.status);
+
+  const { data, count, error } = await query;
+  if (error) throw error;
+
+  return {
+    projects: (data ?? []) as InfraProject[],
+    total: count ?? 0,
+    page,
+    pageCount: Math.max(1, Math.ceil((count ?? 0) / INFRA_PAGE_SIZE)),
+  };
+}
+
+export async function getInfraProjectBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("infrastructure_projects")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as InfraProject | null) ?? null;
+}
