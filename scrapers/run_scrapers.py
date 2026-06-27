@@ -20,13 +20,13 @@ import typer
 from base import ScraperError
 from jakim_foreign_cb import JakimForeignCBScraper
 from halal_foundation_bodies import HalalFoundationBodiesScraper
-from manufacturer_template import ManufacturerTemplateScraper
+from manufacturers_asia_halal import ManufacturersAsiaHalalScraper
 
 # Registry: CLI name -> scraper class. Add new scrapers here.
 SCRAPERS = {
     "jakim-cb": JakimForeignCBScraper,
     "halal-foundation": HalalFoundationBodiesScraper,
-    "manufacturer-template": ManufacturerTemplateScraper,
+    "manufacturers-asia-halal": ManufacturersAsiaHalalScraper,
 }
 
 app = typer.Typer(add_completion=False, help="Halal directory data scrapers.")
