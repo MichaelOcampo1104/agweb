@@ -5,9 +5,10 @@ interface Props {
   page: number;
   pageCount: number;
   baseQuery: Record<string, string | undefined>;
+  basePath?: string;
 }
 
-export function Pagination({ page, pageCount, baseQuery }: Props) {
+export function Pagination({ page, pageCount, baseQuery, basePath = "/manufacturers" }: Props) {
   if (pageCount <= 1) return null;
 
   const pages: number[] = [];
@@ -15,7 +16,7 @@ export function Pagination({ page, pageCount, baseQuery }: Props) {
   const end = Math.min(pageCount, start + 4);
   for (let i = start; i <= end; i++) pages.push(i);
 
-  const link = (p: number) => `/manufacturers${toQuery({ ...baseQuery, page: p })}`;
+  const link = (p: number) => `${basePath}${toQuery({ ...baseQuery, page: p })}`;
   const btn =
     "rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-400 hover:text-brand-700";
 

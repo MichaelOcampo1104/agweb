@@ -88,6 +88,7 @@ export default async function InfrastructurePage({
         page={result.page}
         pageCount={result.pageCount}
         baseQuery={baseQuery}
+        basePath="/infrastructure"
       />
     </div>
   );
