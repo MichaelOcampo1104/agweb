@@ -28,13 +28,18 @@
    - All routes return 200 (/, /manufacturers, /certifiers, /api/*)
    - 10 routes compiled, TypeScript clean, 6.2s build
    - 5 env vars set in Vercel project settings
-   - Aliased domain: `agweb-gold.vercel.app`
+   - GitHub auto-deploy connected (push to main → auto-deploy)
+9. **Database seeded** — 96 certification bodies from 2 sources
+   - JAKIM foreign CB list: 85 bodies across 47+ countries
+   - Halal Foundation list: 12 bodies (1 deduped by unique constraint)
+   - Homepage stats now show real numbers
+   - Fixed: upgraded supabase Python SDK 2.9.1→2.31.0 (new `sb_secret_` key format support)
 
 ## 🔜 Next steps
 
-- [ ] **Populate certifier data** — `cd scrapers && python run_scrapers.py run --all` (seeds ~97 certification bodies; homepage stats will show real numbers instead of zeros)
-- [ ] **Add a manufacturer source** — see AGENTS.md §6: copy `manufacturer_template.py`, implement `fetch()`, register in `run_scrapers.py`
-- [ ] **Connect GitHub auto-deploy** — in Vercel dashboard → Settings → Git → connect `MichaelOcampo1104/agweb` (CLI attempt failed, needs manual connection)
+- [ ] **Add a manufacturer source** — see AGENTS.md §6: copy `manufacturer_template.py`, implement `fetch()`, register in `run_scrapers.py`. This is THE growth path.
+- [ ] (Later) **Custom domain** — in Vercel project settings → Domains
+- [ ] (Later) **Paid listings** — manufacturers with `featured=true` get priority placement
 
 ---
 
