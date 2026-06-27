@@ -45,7 +45,7 @@ create table if not exists public.certification_bodies (
 create or replace function public.generate_cb_slug()
 returns trigger language plpgsql as $$
 begin
-    new.slug = lower(regexp_replace(unaccent(new.name), '[^a-z0-9]+', '-', 'g'));
+    new.slug = btrim(lower(regexp_replace(unaccent(new.name), '[^a-zA-Z0-9]+', '-', 'g')), '-');
     return new;
 end;
 $$;
@@ -186,7 +186,7 @@ create table if not exists public.infrastructure_projects (
 create or replace function public.generate_infra_slug()
 returns trigger language plpgsql as $$
 begin
-    new.slug = lower(regexp_replace(unaccent(new.name), '[^a-z0-9]+', '-', 'g'));
+    new.slug = btrim(lower(regexp_replace(unaccent(new.name), '[^a-zA-Z0-9]+', '-', 'g')), '-');
     return new;
 end;
 $$;
