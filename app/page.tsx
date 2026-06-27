@@ -1,48 +1,54 @@
 import Link from "next/link";
 import { getDirectoryStats, getTopCountries } from "@/lib/queries";
+import { createClient } from "@/lib/server";
 
 export default async function HomePage() {
-  const [stats, topCountries] = await Promise.all([
+  const [stats, topCountries, infraCount] = await Promise.all([
     getDirectoryStats(),
     getTopCountries(),
+    getInfraCount(),
   ]);
 
   return (
     <>
-      {/* Hero / search */}
+      {/* Hero */}
       <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-brand-50 to-white">
         <div className="container-page py-20 text-center">
           <span className="inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
-            Global halal sourcing directory
+            B2B Data Aggregation Platform
           </span>
           <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-            Find halal-certified manufacturers, worldwide
+            Source certified suppliers &amp; track infrastructure pipelines
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
-            One place to search certified producers across {stats.country_count || "many"}{" "}
-            countries — with their certification body, status, and expiry in one view.
+            One platform for halal-certified manufacturers across{" "}
+            {stats.country_count || "many"} countries and Singapore infrastructure
+            project tracking — built for B2B buyers, contractors, and sourcing
+            teams.
           </p>
-          <form
-            action="/manufacturers"
-            className="mx-auto mt-8 flex max-w-xl gap-2"
-          >
-            <input
-              name="q"
-              type="search"
-              placeholder="e.g. halal cosmetics in Turkey"
-              className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-            />
-            <button
-              type="submit"
-              className="rounded-xl bg-brand-600 px-5 py-3 font-medium text-white hover:bg-brand-700"
-            >
-              Search
-            </button>
-          </form>
-          <div className="mt-3 text-sm text-slate-500">
-            or{" "}
+          <div className="mx-auto mt-8 flex max-w-xl gap-2">
+            <form action="/manufacturers" className="flex flex-1 gap-2">
+              <input
+                name="q"
+                type="search"
+                placeholder="e.g. halal cosmetics in Turkey"
+                className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-800 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              />
+              <button
+                type="submit"
+                className="rounded-xl bg-brand-600 px-5 py-3 font-medium text-white hover:bg-brand-700"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+          <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-500">
             <Link href="/manufacturers" className="font-medium text-brand-700 hover:underline">
-              browse all manufacturers →
+              Browse manufacturers →
+            </Link>
+            <span>or</span>
+            <Link href="/infrastructure" className="font-medium text-blue-700 hover:underline">
+              View infrastructure pipeline →
             </Link>
           </div>
         </div>
@@ -53,8 +59,8 @@ export default async function HomePage() {
         {[
           { label: "Manufacturers", value: stats.manufacturer_count },
           { label: "Countries", value: stats.country_count },
-          { label: "Certifiers listed", value: stats.certifier_count },
-          { label: "Active certifiers", value: stats.active_certifier_count },
+          { label: "Certifiers", value: stats.certifier_count },
+          { label: "Infra Projects", value: infraCount },
         ].map((s) => (
           <div
             key={s.label}
@@ -68,11 +74,45 @@ export default async function HomePage() {
         ))}
       </section>
 
+      {/* Verticals */}
+      <section className="container-page mt-20">
+        <h2 className="text-2xl font-bold text-slate-900">Explore</h2>
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <Link
+            href="/manufacturers"
+            className="group rounded-xl border border-slate-200 bg-white p-6 transition hover:border-brand-300 hover:shadow-sm"
+          >
+            <h3 className="font-semibold text-slate-900 group-hover:text-brand-700">
+              🕌 Halal-Certified Manufacturers
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              {stats.manufacturer_count.toLocaleString()} manufacturers across{" "}
+              {stats.country_count || "many"} countries. Filter by industry, certifier,
+              and certification status.
+            </p>
+          </Link>
+          <Link
+            href="/infrastructure"
+            className="group rounded-xl border border-slate-200 bg-white p-6 transition hover:border-blue-300 hover:shadow-sm"
+          >
+            <h3 className="font-semibold text-slate-900 group-hover:text-blue-700">
+              🏗️ Singapore Infrastructure Pipeline
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              {infraCount.toLocaleString()} government infrastructure projects tracked.
+              Filter by agency, project type, and construction status.
+            </p>
+          </Link>
+        </div>
+      </section>
+
       {/* Top countries */}
       {topCountries.length > 0 && (
         <section className="container-page mt-20">
           <h2 className="text-2xl font-bold text-slate-900">Browse by country</h2>
-          <p className="mt-1 text-slate-600">Countries with the most listed manufacturers.</p>
+          <p className="mt-1 text-slate-600">
+            Countries with the most listed manufacturers.
+          </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {topCountries.map(({ country, count }) => (
               <Link
@@ -90,23 +130,26 @@ export default async function HomePage() {
 
       {/* Value props */}
       <section className="container-page mt-20">
-        <h2 className="text-2xl font-bold text-slate-900">Why sourcing teams use it</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Why sourcing teams use Sourcify</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {[
             {
-              title: "Verified certification status",
-              body: "See the certifying body, certificate number, and expiry date — not just a logo.",
+              title: "Multi-vertical coverage",
+              body: "Halal certification, infrastructure projects, and more — one platform, one search experience.",
             },
             {
               title: "Stop hunting across 100 sites",
-              body: "Halal certification is fragmented across dozens of bodies worldwide. We unify the search.",
+              body: "Halal certification and government project data are fragmented across dozens of sources. We unify them.",
             },
             {
               title: "Built for B2B buyers",
-              body: "Filter by industry, country, and certifier to build a qualified shortlist fast.",
+              body: "Filter by industry, country, agency, and status to build a qualified shortlist fast.",
             },
           ].map((v) => (
-            <div key={v.title} className="rounded-xl border border-slate-200 bg-white p-6">
+            <div
+              key={v.title}
+              className="rounded-xl border border-slate-200 bg-white p-6"
+            >
               <h3 className="font-semibold text-slate-900">{v.title}</h3>
               <p className="mt-2 text-sm text-slate-600">{v.body}</p>
             </div>
@@ -132,4 +175,17 @@ export default async function HomePage() {
       </section>
     </>
   );
+}
+
+/** Quick infra project count for the homepage stats. */
+async function getInfraCount(): Promise<number> {
+  try {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from("infrastructure_projects")
+      .select("*", { count: "exact", head: true });
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
 }

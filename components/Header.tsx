@@ -6,9 +6,9 @@ export function Header() {
       <div className="container-page flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold text-slate-900">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">
-            H
+            S
           </span>
-          <span className="hidden sm:inline">Halal Directory</span>
+          <span className="hidden sm:inline">Sourcify</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm font-medium text-slate-600">
           <Link href="/manufacturers" className="hover:text-brand-700">

@@ -10,16 +10,16 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   ),
   title: {
-    default: "Halal Directory — Global Halal-Certified Manufacturers & Certifiers",
-    template: "%s | Halal Directory",
+    default: "Sourcify — B2B Data Aggregation Platform",
+    template: "%s | Sourcify",
   },
   description:
-    "Search the global directory of halal-certified manufacturers and halal certification bodies. Filter by country, industry, and certifier — built for importers, distributors, and sourcing teams.",
+    "B2B data aggregation platform. Search halal-certified manufacturers, track Singapore infrastructure projects, and more — built for importers, contractors, and sourcing teams.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Halal Directory — Global Halal-Certified Manufacturers",
+    title: "Sourcify — B2B Data Aggregation Platform",
     description:
-      "One place to find halal-certified manufacturers worldwide. Filter by country, industry, and certification body.",
+      "One place to search halal-certified manufacturers and track government infrastructure projects worldwide.",
     type: "website",
   },
 };
