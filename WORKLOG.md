@@ -38,12 +38,30 @@
     - All MUIS-certified across 40+ industries (Frozen Foods, Eggs, Caterers, Cafes, etc.)
     - Homepage: **500 manufacturers, 96 certifiers, 1 country** (verified on live site)
 
+11. **Certifier data-quality fix (major)** — the JAKIM parser flattened the PDF to
+    text and guessed at the name/contact boundary, which glued street addresses,
+    contact-person names, and Chinese characters onto certifier names (e.g.
+    `Agency for Halal Quality Certification (AHQC) Turalibegova 73`). Rewrote it to
+    read the PDF's real 4-column table (`pdfplumber.extract_tables`) and split name
+    from address within the cell, plus a defensive `_is_clean_name` gate that drops
+    anything ambiguous. Went from **96 dirty → 88 clean** certifier rows, **45 countries**.
+12. **Idempotent scraper re-runs** — added `before_upsert()` hook to `BaseScraper`;
+    JAKIM and Halal Foundation now delete their own prior rows before re-inserting
+    (a changed name never leaves an orphan). Canonical country names (USA/UK →
+    United States/United Kingdom) dedupe across sources.
+13. **SEO canonical fix** — `layout.tsx` hardcoded `metadataBase` to the placeholder
+    `halaldirectory.example`; now uses `NEXT_PUBLIC_SITE_URL` (same fix in `sitemap.ts`
+    / `robots.ts`). Live canonical points at the real domain.
+14. **Redeployed** to Vercel and verified clean certifier names render on the live
+    `/certifiers` page; confirmed zero residual address-garbage.
+
 ## 🔜 Next steps
 
 - [ ] **Add more manufacturer sources** — see AGENTS.md §6 for the template. Target certifier "client lists" (ISA, IFANCA, Halal Control, BPJPH, etc.)
 - [ ] **Add country diversity** — current 500 manufacturers are all Singapore; next source should target a different region (US, EU, Middle East, ASEAN)
 - [ ] (Later) **Custom domain** — in Vercel project settings → Domains
 - [ ] (Later) **Paid listings** — manufacturers with `featured=true` get priority placement
+- [ ] (Later) **Scheduled scraper runs** — GitHub Actions cron so data stays fresh without manual runs
 
 ---
 
@@ -61,6 +79,9 @@
 
 ## 🔧 Known gotchas (see AGENTS.md §12 for full list)
 - **`typer` + `click`:** `requirements.txt` pins `click==8.1.8` — don't bump without bumping typer.
-- **JAKIM PDF parsing is fragile** — if `jakim_foreign_cb.py` returns 0 rows, the PDF layout changed; update parser + pinned URL at top of file.
+- **JAKIM PDF parsing** — now table-based (`extract_tables`) and robust to the
+  25-Feb-2025 edition. If a future edition returns 0 rows, the layout changed —
+  the parser logs `error`, never silently writes junk. Update the parser + the
+  pinned URL at the top of `jakim_foreign_cb.py`.
 - **Next 16:** `cookies()` is async — `lib/server.ts`'s `createClient()` must be `await`ed.
 - **Supabase partial `select()` loses types** — annotate `.forEach`/`.map` callbacks in `lib/queries.ts`.
