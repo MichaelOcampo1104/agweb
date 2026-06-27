@@ -25,15 +25,16 @@ function param(v: string | string[] | undefined): string | undefined {
 export default async function ManufacturersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
+  const sp = await searchParams;
   const filters: FilterValues = {
-    q: param(searchParams.q),
-    country: param(searchParams.country),
-    cert_body: param(searchParams.cert_body),
-    industry: param(searchParams.industry),
-    status: param(searchParams.status),
-    page: param(searchParams.page) ? Number(param(searchParams.page)) : 1,
+    q: param(sp.q),
+    country: param(sp.country),
+    cert_body: param(sp.cert_body),
+    industry: param(sp.industry),
+    status: param(sp.status),
+    page: param(sp.page) ? Number(param(sp.page)) : 1,
   };
 
   const [result, options] = await Promise.all([
