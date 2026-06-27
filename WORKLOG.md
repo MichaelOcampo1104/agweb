@@ -32,12 +32,16 @@
 9. **Database seeded** — 96 certification bodies from 2 sources
    - JAKIM foreign CB list: 85 bodies across 47+ countries
    - Halal Foundation list: 12 bodies (1 deduped by unique constraint)
-   - Homepage stats now show real numbers
    - Fixed: upgraded supabase Python SDK 2.9.1→2.31.0 (new `sb_secret_` key format support)
+10. **First manufacturer source live** — 500 Singapore companies via Asia Halal Directory
+    - Scraper: `manufacturers_asia_halal.py` (10 pages, 50 entries each)
+    - All MUIS-certified across 40+ industries (Frozen Foods, Eggs, Caterers, Cafes, etc.)
+    - Homepage: **500 manufacturers, 96 certifiers, 1 country** (verified on live site)
 
 ## 🔜 Next steps
 
-- [ ] **Add a manufacturer source** — see AGENTS.md §6: copy `manufacturer_template.py`, implement `fetch()`, register in `run_scrapers.py`. This is THE growth path.
+- [ ] **Add more manufacturer sources** — see AGENTS.md §6 for the template. Target certifier "client lists" (ISA, IFANCA, Halal Control, BPJPH, etc.)
+- [ ] **Add country diversity** — current 500 manufacturers are all Singapore; next source should target a different region (US, EU, Middle East, ASEAN)
 - [ ] (Later) **Custom domain** — in Vercel project settings → Domains
 - [ ] (Later) **Paid listings** — manufacturers with `featured=true` get priority placement
 
