@@ -166,15 +166,17 @@ Enforced by **Row Level Security** in `db/schema.sql`. The anon key is safe to e
 ## 🗺 Roadmap
 
 - [x] Database schema with full-text search + RLS + monetization fields
-- [x] Live JAKIM & Halal Foundation certifier scrapers
+- [x] Live JAKIM & Halal Foundation certifier scrapers (96 bodies / 47+ countries)
 - [x] Manufacturer scraper template (fully wired)
 - [x] Directory UI: homepage, manufacturers, detail pages, certifiers, lead form
 - [x] JSON search API + dynamic sitemap/robots
-- [ ] First manufacturer data sources (per-source scrapers)
+- [x] First manufacturer data source (Asia Halal Directory — 500 companies)
+- [x] Production deployment (Vercel + Supabase) — [agweb-gold.vercel.app](https://agweb-gold.vercel.app)
+- [ ] More manufacturer sources (US, EU, Middle East — see AGENTS.md §6)
+- [ ] New verticals (organic, fair trade, ISO, etc. — see AGENTS.md §1)
 - [ ] Featured-listing admin + checkout flow
 - [ ] Lead-matching pipeline (auto-match buyers to certified suppliers)
 - [ ] Scheduled scraper runs (cron / GitHub Actions)
-- [ ] Production deployment (Vercel + Supabase)
 
 ---
 

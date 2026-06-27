@@ -8,10 +8,17 @@ conventions, and the approved patterns for extending it.
 
 ## 1. What this project is
 
-**Halal Directory** — a global aggregator of **halal-certified manufacturers**
-and the **certification bodies** that certify them.
+**B2B Data Aggregation Platform** — a multi-vertical directory platform that
+aggregates hard-to-find, frequently-needed business data from fragmented public
+sources. The current vertical is **halal-certified manufacturers**, but the
+platform is designed to expand into additional verticals (organic certification,
+fair trade, ISO standards, supply-chain compliance, etc.).
 
-Business model (informs every product decision):
+**Current vertical (live): Halal Directory** — a global aggregator of
+**halal-certified manufacturers** and the **certification bodies** that certify
+them.
+
+Business model (applies across verticals):
 - **Traffic**: organic SEO. Users hate hunting across dozens of certifier sites.
 - **Monetization**: (1) paid featured listings, (2) B2B lead generation,
   (3) later — ads, premium data access, sponsored sections.
@@ -21,6 +28,21 @@ Business model (informs every product decision):
 When making product calls: the data must be *genuinely hard to find elsewhere*,
 *frequently needed*, and *kept fresh*. Stale or trivially-Googleable data has
 negative value here.
+
+### The expansion vision: a platform, not a single directory
+
+The infrastructure — Next.js, Supabase, Python scrapers, RLS security — is
+vertical-agnostic. Each new vertical follows the same pattern:
+
+1. **Pick a niche** where certification/registration data is fragmented across
+   bodies (organic, kosher, fair trade, ISO, FSC, etc.)
+2. **Seed the certifier/authority directory** (the SEO backbone)
+3. **Add manufacturer/supplier sources** (the core product)
+4. **Monetize** via the same mechanisms (featured listings, lead gen)
+
+Every new vertical adds a new set of pages, API endpoints, and scrapers that
+share the same database, auth model, and deployment. This is the "project
+pipeline" — a repeatable factory for B2B data directories.
 
 ---
 
@@ -118,10 +140,13 @@ Both need `.env` at repo root (copy `.env.example`). See README §Quick start.
 
 ---
 
-## 6. ★ The primary expansion path: adding a manufacturer source
+## 6. ★ Expansion paths
 
-This is THE way the product grows. The certifier directory is seeded; the real
-product is `manufacturers`. Follow this exactly:
+There are two ways the product grows:
+
+### Path A: Adding a manufacturer source (current vertical)
+
+This is THE way the current halal vertical grows. Follow this exactly:
 
 1. **Find a source** that lists manufacturers + cert details. Best early
    sources: a single certifier's public "certified companies" list.
@@ -140,7 +165,28 @@ product is `manufacturers`. Follow this exactly:
 
 Upsert is idempotent on `(name, country)` — re-runs update, never duplicate.
 
-### Scraper conventions
+### Path B: Adding a new vertical (the project pipeline)
+
+To launch a new directory vertical (e.g., "Organic Certification Directory",
+"Fair Trade Suppliers", "ISO-Certified Manufacturers"):
+
+1. **Schema** — add new tables to `db/schema.sql` (or reuse the pattern from
+   `manufacturers` / `certification_bodies`). Run in Supabase SQL Editor.
+2. **Update DB types** — `lib/db/database.types.ts` to match.
+3. **Add routes** in `app/<vertical>/` following the existing pattern:
+   directory page, `[slug]/` detail, API endpoint.
+4. **Add SEO surface** — sitemap entries, metadata, structured data, internal
+   linking from the homepage.
+5. **Add scrapers** — one for certifiers/authorities, then manufacturer-level
+   sources.
+6. **Update homepage** to feature the new vertical (stats card, search entry
+   point, or nav link).
+
+Each vertical lives in its own URL namespace (`/<vertical>/`) and owns its own
+tables, but shares the same infrastructure, auth model, and monetization
+surfaces.
+
+### Scraper conventions (both paths)
 - Subclass `BaseScraper`. Set `name` and `target_table` ("manufacturers" or
   "certification_bodies").
 - Use `self.get_text(url)` for HTML and `self.download(url, filename)` for
@@ -243,9 +289,17 @@ Enforced by **Row Level Security** in `db/schema.sql`. Rules:
 
 ## 13. Decision log (deliberate choices)
 
-- **Niche = halal manufacturers** (global, underserved, B2B buyers, fragmented
-  certifiers = aggregator opportunity). Not generic.
-- **Certifier directory ships live; manufacturers ship as a template.** The
+- **Platform, not a single directory.** The infrastructure is vertical-agnostic.
+  Halal is the first vertical, not the only one. New verticals follow the same
+  pattern without reinventing the DB/auth/scraper/deploy stack.
+- **One Supabase project for all verticals.** Tables are namespaced by vertical
+  (or use a `vertical` column). RLS + anon-key-read stays per-table. Don't spin
+  up separate DBs per vertical — that kills cross-vertical SEO and complicates
+  monetization.
+- **Niche directories, not a generic aggregator.** Each vertical is underserved
+  B2B data with fragmented certifiers = aggregator opportunity. Not generic
+  "business directory."
+- **Certifier directory ships live; manufacturers ship as scrapers.** The
   plumbing is done; each manufacturer source is a small follow-on. Don't build a
   "generic source connector" abstraction — concrete scrapers are clearer.
 - **RLS = public read.** Traffic is the business; gatekeeping reads would kill
