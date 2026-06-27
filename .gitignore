@@ -41,3 +41,4 @@ __pycache__/
 
 # downloaded source files (keep scrapers reproducible, don't commit data)
 /scrapers/downloads/
+.vercel
