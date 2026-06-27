@@ -24,22 +24,23 @@
 6. **`.env` created** — all 5 vars set (Supabase URL, anon key, service role key, site URL)
 7. **Local run verified** — `npm run dev` → all pages respond HTTP 200 (homepage, /manufacturers, /certifiers)
 
+8. **Deployed to Vercel** 🚀 — **https://agweb-gold.vercel.app** (production)
+   - All routes return 200 (/, /manufacturers, /certifiers, /api/*)
+   - 10 routes compiled, TypeScript clean, 6.2s build
+   - 5 env vars set in Vercel project settings
+   - Aliased domain: `agweb-gold.vercel.app`
+
 ## 🔜 Next steps
 
-### Step 1 — Populate data (optional but recommended before deploy)
-- [ ] `cd scrapers && python run_scrapers.py run --all` to seed certifier data
-- [ ] Homepage stats will show real numbers instead of zeros
-
-### Step 2 — Deploy to Vercel
-- [ ] Import repo into Vercel (vercel.com → New Project → `MichaelOcampo1104/agweb`)
-- [ ] Add env vars in Vercel project settings (copy from `.env`)
-- [ ] Deploy → get live URL → update `NEXT_PUBLIC_SITE_URL` to match
+- [ ] **Populate certifier data** — `cd scrapers && python run_scrapers.py run --all` (seeds ~97 certification bodies; homepage stats will show real numbers instead of zeros)
+- [ ] **Add a manufacturer source** — see AGENTS.md §6: copy `manufacturer_template.py`, implement `fetch()`, register in `run_scrapers.py`
+- [ ] **Connect GitHub auto-deploy** — in Vercel dashboard → Settings → Git → connect `MichaelOcampo1104/agweb` (CLI attempt failed, needs manual connection)
 
 ---
 
 ## 🔁 How to resume (copy-paste this to the agent)
 
-> "Resume the agweb project. Read WORKLOG.md. Help me deploy to Vercel."
+> "Resume the agweb project. Read WORKLOG.md. The site is live at agweb-gold.vercel.app. Let's seed some data and add our first manufacturer source."
 
 ---
 
