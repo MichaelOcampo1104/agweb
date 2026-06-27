@@ -31,10 +31,12 @@ _CHROME_HEADINGS = {
     "subscribe to our newsletter", "locations",
 }
 
-# Certifier names that embed a country/region hint.
+# Certifier names that embed a country/region hint. Country strings MUST match
+# the canonical names used by the JAKIM scraper (see jakim_foreign_cb._clean_country)
+# so upserts merge rows instead of splitting them on "USA" vs "United States".
 _COUNTRY_HINTS = [
-    ("USA", ["american", "u.s.", "usa", "united states"]),
-    ("UK", [" uk ", "united kingdom", "british"]),
+    ("United States", ["american", "u.s.", "usa", "united states"]),
+    ("United Kingdom", [" uk ", "united kingdom", "british"]),
     ("Canada", ["canada", "canadian"]),
     ("Australia", ["australia", "australian"]),
     ("India", ["india", "hind"]),
@@ -43,13 +45,18 @@ _COUNTRY_HINTS = [
     ("Thailand", ["thailand", "cicot"]),
     ("Taiwan", ["taiwan", "thida"]),
     ("UAE", ["emirates", "esma", "uae"]),
-    ("South Africa", ["south africa", "sanhā", "sanha"]),
+    ("South Africa", ["south africa", "sanhã", "sanha"]),
 ]
 
 
 class HalalFoundationBodiesScraper(BaseScraper):
     name = "halal_foundation_bodies"
     target_table = "certification_bodies"
+
+    def before_upsert(self) -> None:
+        """Replace rows previously written by THIS scraper (see JAKIM scraper's
+        before_upsert for rationale — keeps re-runs idempotent)."""
+        self.client.table(self.target_table).delete().eq("source", self.name).execute()
 
     def fetch(self) -> list[dict[str, Any]]:
         html = self.get_text(SOURCE_URL)

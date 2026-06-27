@@ -93,6 +93,13 @@ class BaseScraper:
         """Return a list of row dicts. Override in each subclass."""
         raise NotImplementedError
 
+    def before_upsert(self) -> None:
+        """Hook run immediately before upserting, with the DB client available.
+        Override to delete stale rows from a previous run of THIS source, so
+        re-runs are idempotent (no orphans left behind when names change).
+        Default: do nothing."""
+        return None
+
     # -------------------------------------------------------------- upserting
     def _dedupe_key(self, row: dict[str, Any]) -> dict[str, Any]:
         """Columns that uniquely identify a row (must match a UNIQUE constraint)."""
@@ -141,6 +148,7 @@ class BaseScraper:
                 for r in rows[:5]:
                     print(f"          sample: {r}")
             else:
+                self.before_upsert()                       # prune stale rows first
                 written = self.upsert(rows)
                 result.rows_upserted = written
                 print(f"[ok] {self.name}: fetched {len(rows)}, upserted {written}")
