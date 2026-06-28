@@ -5,7 +5,7 @@
   "description": "Global Halal-Certified Manufacturers aggregator directory",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/generate-sitemap.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
