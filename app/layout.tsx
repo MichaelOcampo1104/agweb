@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   // Drives absolute URLs (canonical, OpenGraph images) for every route.
-  // Falls back to localhost so local dev never throws on a missing env var.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  ),
+  // SITE_URL warns in production builds if NEXT_PUBLIC_SITE_URL is unset.
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Sourcify — B2B Data Aggregation Platform",
     template: "%s | Sourcify",
