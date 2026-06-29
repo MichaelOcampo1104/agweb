@@ -8,12 +8,13 @@ import {
 import { initial, statusBadge } from "@/lib/utils";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 /** Dynamic metadata for SEO + social shares. */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const m = await getManufacturerBySlug(params.slug);
+  const { slug } = await params;
+  const m = await getManufacturerBySlug(slug);
   if (!m) return { title: "Manufacturer not found" };
   return {
     title: `${m.name} — Halal-Certified Manufacturer`,
@@ -50,7 +51,8 @@ function jsonLd(m: Awaited<ReturnType<typeof getManufacturerBySlug>>) {
 }
 
 export default async function ManufacturerDetailPage({ params }: Props) {
-  const m = await getManufacturerBySlug(params.slug);
+  const { slug } = await params;
+  const m = await getManufacturerBySlug(slug);
   if (!m) notFound();
 
   const related = await getRelatedManufacturers(m);
