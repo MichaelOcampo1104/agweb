@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import {
   getManufacturers,
   getFilterOptions,
@@ -68,15 +69,30 @@ export default async function ManufacturersPage({
       </Suspense>
 
       {result.manufacturers.length === 0 ? (
-        <div className="mt-16 rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-          <h2 className="text-lg font-semibold text-slate-900">No manufacturers found</h2>
-          <p className="mt-2 text-slate-500">
-            Try adjusting your filters, or{" "}
-            <a href="/leads/new" className="text-brand-700 hover:underline">
-              request a sourcing lead
-            </a>{" "}
-            and we&apos;ll match you with certified suppliers.
+        <div className="mt-16 rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center max-w-lg mx-auto shadow-sm">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-400">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+            </svg>
+          </div>
+          <h2 className="mt-4 text-lg font-semibold text-slate-900">No manufacturers found</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            We couldn&apos;t find any certified manufacturers matching your current filters. Try resetting them, or submit a sourcing request to have our team match you.
           </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/manufacturers"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
+            >
+              Reset all filters
+            </Link>
+            <Link
+              href="/leads/new"
+              className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 shadow-sm transition"
+            >
+              Request sourcing lead
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -76,6 +76,44 @@ export function DirectoryFilters({ countries, industries, certBodies }: Props) {
           <option key={c} value={c}>{c}</option>
         ))}
       </select>
+
+      {/* Active Filter Chips */}
+      {(() => {
+        const activeFilters = [
+          { key: "q", label: params.get("q") ? `Search: "${params.get("q")}"` : null },
+          { key: "country", label: params.get("country") },
+          { key: "industry", label: params.get("industry") },
+          { key: "cert_body", label: params.get("cert_body") },
+        ].filter((f) => f.label);
+
+        if (activeFilters.length === 0) return null;
+
+        return (
+          <div className="lg:col-span-5 mt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-slate-500">Active filters:</span>
+            {activeFilters.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => update(f.key, "")}
+                className="flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition"
+              >
+                {f.label}
+                <span className="text-brand-400 font-bold hover:text-brand-600">×</span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                router.push("/manufacturers");
+              }}
+              className="text-xs font-semibold text-slate-500 hover:text-brand-700 transition ml-1"
+            >
+              Clear all
+            </button>
+          </div>
+        );
+      })()}
     </form>
   );
 }
