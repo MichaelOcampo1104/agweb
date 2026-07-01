@@ -306,3 +306,45 @@ Enforced by **Row Level Security** in `db/schema.sql`. Rules:
   SEO. Monetization is via featured placement + leads, not paywalls on data.
 - **Hand-written DB types** instead of requiring the Supabase CLI to build
   locally. Regenerable when the CLI is available.
+
+---
+
+## 14. SEO & Search Console (in progress — 2026-06-28)
+
+SEO is the traffic engine (§7), so the plumbing is centralized and hardened.
+What's done vs. what's still pending:
+
+### Done (shipped, live on `agweb-gold.vercel.app`)
+- **`lib/site-url.ts`** — single source of truth for the canonical site URL.
+  `SITE_URL` + `siteUrl(path)`. **Warns at production build time** if
+  `NEXT_PUBLIC_SITE_URL` is unset or still `localhost` — that state produces a
+  sitemap pointing at localhost and Google silently ignores every URL.
+  All SEO consumers (`sitemap.ts`, `robots.ts`, `layout.tsx`) import from here;
+  don't re-read the env var inline elsewhere.
+- **`app/sitemap.ts`** — complete: static pages (incl. `/infrastructure`) +
+  all manufacturer detail pages + all infrastructure detail pages. Queries
+  run in parallel. **Only emit `[slug]` URLs for routes that actually exist**
+  — `/certifiers/[slug]` is intentionally omitted because that route doesn't
+  exist (would create 404s that hurt indexing).
+- **`app/robots.ts`** — allows all crawlers, points to sitemap.
+- **`public/google7cddd593802f59bb.html`** — Google Search Console HTML
+  verification file. Verified live: HTTP 200, body matches exactly.
+  (Files in `public/` are served at the site root.)
+
+### FOLLOW-UP (requires owner's Google login — can't be automated)
+- [ ] **Verify ownership** in [Search Console](https://search.google.com/search-console):
+  property is `https://agweb-gold.vercel.app/` (HTTPS + trailing slash) →
+  click **Verify**. Should turn green immediately.
+- [ ] **Submit sitemap**: Sitemaps tab → enter `sitemap.xml` → Submit.
+- [ ] **Monitor indexing**: Performance → Pages. First pages typically index
+  in days; fuller coverage over weeks.
+- [ ] **Custom domain** (recommended, not blocking): a `*.vercel.app`
+  subdomain ranks weaker long-term. When a custom domain is added, update
+  `NEXT_PUBLIC_SITE_URL` in Vercel env vars — the code handles the rest, and
+  the Search Console property will need re-verifying under the new domain.
+
+### Convention: adding a new vertical's pages to the sitemap
+When a new vertical lands (§6 Path B), extend `app/sitemap.ts` with both its
+listing page and its `[slug]` detail pages (parallel `Promise.all` query),
+and add the listing to the `staticPages` array. Confirm the detail route
+exists first — never emit a URL that 404s.

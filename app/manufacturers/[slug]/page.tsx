@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SITE_URL } from "@/lib/site-url";
 import {
   getManufacturerBySlug,
   getRelatedManufacturers,
 } from "@/lib/queries";
 import { initial, statusBadge } from "@/lib/utils";
+import { ManufacturerCard } from "@/components/ManufacturerCard";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -86,6 +88,20 @@ export default async function ManufacturerDetailPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(m)! }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+              { "@type": "ListItem", "position": 2, "name": "Manufacturers", "item": `${SITE_URL}/manufacturers` },
+              { "@type": "ListItem", "position": 3, "name": m.name, "item": `${SITE_URL}/manufacturers/${m.slug}` }
+            ]
+          })
+        }}
       />
 
       {/* Breadcrumb */}
@@ -281,16 +297,7 @@ export default async function ManufacturerDetailPage({ params }: Props) {
           </h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((r) => (
-              <Link
-                key={r.slug}
-                href={`/manufacturers/${r.slug}`}
-                className="rounded-lg border border-slate-200 bg-white p-4 hover:border-brand-300"
-              >
-                <div className="font-medium text-slate-900">{r.name}</div>
-                <div className="mt-1 text-sm text-slate-500">
-                  {[r.city, r.country].filter(Boolean).join(", ")}
-                </div>
-              </Link>
+              <ManufacturerCard key={r.slug} m={r} />
             ))}
           </div>
         </section>

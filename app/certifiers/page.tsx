@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site-url";
 import { getCertBodies } from "@/lib/queries";
 import { CertifierSearchList } from "@/components/CertifierSearchList";
 
@@ -17,8 +18,31 @@ export default async function CertifiersPage() {
   const countriesSet = new Set<string>();
   bodies.forEach((b) => b.country && countriesSet.add(b.country));
 
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": SITE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Certifiers",
+        "item": `${SITE_URL}/certifiers`
+      }
+    ]
+  });
+
   return (
     <div className="container-page py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+      />
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">
           Halal Certification Bodies

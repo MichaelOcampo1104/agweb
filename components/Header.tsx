@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  /** Returns true if the nav link's path matches the current route. */
+  function isActive(path: string) {
+    return pathname.startsWith(path);
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur">
@@ -19,13 +26,22 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-          <Link href="/manufacturers" className="hover:text-brand-700">
+          <Link
+            href="/manufacturers"
+            className={isActive("/manufacturers") ? "text-brand-700 font-semibold" : "hover:text-brand-700"}
+          >
             Manufacturers
           </Link>
-          <Link href="/certifiers" className="hover:text-brand-700">
+          <Link
+            href="/certifiers"
+            className={isActive("/certifiers") ? "text-brand-700 font-semibold" : "hover:text-brand-700"}
+          >
             Certifiers
           </Link>
-          <Link href="/infrastructure" className="hover:text-blue-700">
+          <Link
+            href="/infrastructure"
+            className={isActive("/infrastructure") ? "text-blue-700 font-semibold" : "hover:text-blue-700"}
+          >
             Infrastructure
           </Link>
           <Link
@@ -61,21 +77,21 @@ export function Header() {
             <Link
               href="/manufacturers"
               onClick={() => setIsOpen(false)}
-              className="rounded-lg px-3 py-2 hover:bg-slate-50 hover:text-brand-700"
+              className={`rounded-lg px-3 py-2 ${isActive("/manufacturers") ? "bg-brand-50 text-brand-700 font-semibold" : "hover:bg-slate-50 hover:text-brand-700"}`}
             >
               Manufacturers
             </Link>
             <Link
               href="/certifiers"
               onClick={() => setIsOpen(false)}
-              className="rounded-lg px-3 py-2 hover:bg-slate-50 hover:text-brand-700"
+              className={`rounded-lg px-3 py-2 ${isActive("/certifiers") ? "bg-brand-50 text-brand-700 font-semibold" : "hover:bg-slate-50 hover:text-brand-700"}`}
             >
               Certifiers
             </Link>
             <Link
               href="/infrastructure"
               onClick={() => setIsOpen(false)}
-              className="rounded-lg px-3 py-2 hover:bg-slate-50 hover:text-blue-700"
+              className={`rounded-lg px-3 py-2 ${isActive("/infrastructure") ? "bg-blue-50 text-blue-700 font-semibold" : "hover:bg-slate-50 hover:text-blue-700"}`}
             >
               Infrastructure
             </Link>

@@ -27,9 +27,36 @@ export function Footer() {
         <div>
           <h4 className="text-sm font-semibold text-slate-900">Sources</h4>
           <ul className="mt-3 space-y-2 text-sm text-slate-500">
-            <li>JAKIM (Malaysia)</li>
-            <li>Halal Foundation</li>
-            <li>data.gov.sg</li>
+            <li>
+              <a
+                href="https://www.jakim.gov.my/"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="hover:text-brand-700"
+              >
+                JAKIM (Malaysia)
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.halalfoundation.org/"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="hover:text-brand-700"
+              >
+                Halal Foundation
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://data.gov.sg/"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="hover:text-brand-700"
+              >
+                data.gov.sg
+              </a>
+            </li>
             <li>Public certifier lists</li>
           </ul>
         </div>

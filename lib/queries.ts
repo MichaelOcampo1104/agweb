@@ -95,13 +95,13 @@ export async function getRelatedManufacturers(m: Manufacturer, limit = 6) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("manufacturers")
-    .select("name, slug, country, city, cert_body, industries")
+    .select("id, name, slug, country, city, cert_body, cert_status, industries, featured, featured_until")
     .eq("country", m.country)
     .neq("id", m.id)
     .limit(limit);
   return (data ?? []) as Pick<
     Manufacturer,
-    "name" | "slug" | "country" | "city" | "cert_body" | "industries"
+    "id" | "name" | "slug" | "country" | "city" | "cert_body" | "cert_status" | "industries" | "featured" | "featured_until"
   >[];
 }
 

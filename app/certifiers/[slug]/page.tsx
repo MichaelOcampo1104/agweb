@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SITE_URL } from "@/lib/site-url";
 import { getCertBodyBySlug, getManufacturersByCertBody } from "@/lib/queries";
 import { statusBadge } from "@/lib/utils";
 
@@ -46,6 +47,20 @@ export default async function CertifierDetailPage({ params }: Props) {
   return (
     <div className="container-page py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+              { "@type": "ListItem", "position": 2, "name": "Certifiers", "item": `${SITE_URL}/certifiers` },
+              { "@type": "ListItem", "position": 3, "name": body.name, "item": `${SITE_URL}/certifiers/${body.slug}` }
+            ]
+          })
+        }}
+      />
 
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-slate-500">

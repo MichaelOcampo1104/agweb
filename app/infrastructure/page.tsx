@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { SITE_URL } from "@/lib/site-url";
 import {
   getInfraProjects,
   getInfraFilterOptions,
@@ -48,8 +49,31 @@ export default async function InfrastructurePage({
     status: filters.status,
   };
 
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": SITE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Infrastructure",
+        "item": `${SITE_URL}/infrastructure`
+      }
+    ]
+  });
+
   return (
     <div className="container-page py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+      />
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">
           Singapore Infrastructure Pipeline

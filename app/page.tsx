@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getDirectoryStats, getTopCountries } from "@/lib/queries";
 import { createClient } from "@/lib/server";
+import { SITE_URL } from "@/lib/site-url";
 
 export default async function HomePage() {
   const [stats, topCountries, infraCount] = await Promise.all([
@@ -265,6 +266,54 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── FAQ Section ─────────────────────────────────────────── */}
+      <section className="container-page mt-20 border-t border-slate-200 pt-16">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-2xl font-bold text-center text-slate-900">Frequently Asked Questions</h2>
+          <p className="mt-2 text-center text-slate-500">
+            Common questions about our directories and halal certification data.
+          </p>
+
+          <div className="mt-8 space-y-4">
+            {[
+              {
+                q: "What is Sourcify?",
+                a: "Sourcify is a B2B data aggregation platform that unifies fragmented public certification records. We currently aggregate halal-certified manufacturers and Singapore construction/infrastructure project pipelines.",
+              },
+              {
+                q: "How do you verify supplier halal status?",
+                a: "We only collect data from official certifier registries (such as JAKIM and MUIS). Each manufacturer profile lists its certifying body, certificate number, and validity date for full transparency.",
+              },
+              {
+                q: "Can I list my certified manufacturing business?",
+                a: "Yes. Click 'List your company' to submit a sourcing lead. If your business holds active, verifiable credentials from a recognized certifier, we will list it in the directory.",
+              },
+              {
+                q: "Do you charge sourcing teams to use the platform?",
+                a: "Browsing the directories is completely free for buyers. We monetize via paid featured placements for suppliers and premium sourcing reports for buyers looking for validated shortlists.",
+              },
+            ].map((faq, idx) => (
+              <details
+                key={idx}
+                className="group rounded-xl border border-slate-200 bg-white p-5 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900">
+                  <h3 className="font-semibold text-sm sm:text-base">{faq.q}</h3>
+                  <span className="shrink-0 rounded-full bg-slate-50 p-1.5 text-slate-500 group-open:rotate-180 transition">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 border-t border-slate-100 pt-3">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="container-page mt-20">
         <div className="rounded-2xl bg-brand-700 p-8 text-center text-white sm:p-12">
@@ -281,6 +330,73 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+      
+      {/* FAQPage Schema JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is Sourcify?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sourcify is a B2B data aggregation platform that unifies fragmented public certification records. We currently aggregate halal-certified manufacturers and Singapore construction/infrastructure project pipelines."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How do you verify supplier halal status?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We only collect data from official certifier registries (such as JAKIM and MUIS). Each manufacturer profile lists its certifying body, certificate number, and validity date for full transparency."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I list my certified manufacturing business?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Click 'List your company' to submit a sourcing lead. If your business holds active, verifiable credentials from a recognized certifier, we will list it in the directory."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do you charge sourcing teams to use the platform?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Browsing the directories is completely free for buyers. We monetize via paid featured placements for suppliers and premium sourcing reports for buyers looking for validated shortlists."
+                }
+              }
+            ]
+          })
+        }}
+      />
+
+      {/* WebSite + SearchAction JSON-LD (enables Google Sitelinks Searchbox) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Sourcify",
+            "url": SITE_URL,
+            "description": "B2B data aggregation platform — halal-certified manufacturers, Singapore infrastructure projects, and more.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `${SITE_URL}/manufacturers?q={search_term_string}`
+              },
+              "query-input": "required name=search_term_string"
+            }
+          })
+        }}
+      />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site-url";
 import {
   getManufacturers,
   getFilterOptions,
@@ -51,8 +52,31 @@ export default async function ManufacturersPage({
     status: filters.status,
   };
 
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": SITE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Manufacturers",
+        "item": `${SITE_URL}/manufacturers`
+      }
+    ]
+  });
+
   return (
     <div className="container-page py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+      />
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Manufacturers</h1>
         <p className="mt-2 text-slate-600">

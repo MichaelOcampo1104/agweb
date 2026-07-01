@@ -2,7 +2,21 @@ import Link from "next/link";
 import type { Manufacturer } from "@/lib/queries";
 import { initial, statusBadge } from "@/lib/utils";
 
-export function ManufacturerCard({ m }: { m: Manufacturer }) {
+type ManufacturerCardProps = Pick<
+  Manufacturer,
+  | "id"
+  | "name"
+  | "slug"
+  | "country"
+  | "city"
+  | "industries"
+  | "cert_body"
+  | "cert_status"
+  | "featured"
+  | "featured_until"
+>;
+
+export function ManufacturerCard({ m }: { m: ManufacturerCardProps }) {
   const isFeatured = m.featured && (!m.featured_until || new Date(m.featured_until) > new Date());
 
   if (isFeatured) {
