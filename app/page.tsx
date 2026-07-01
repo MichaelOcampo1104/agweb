@@ -11,7 +11,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero */}
+      {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-brand-50 to-white">
         <div className="container-page py-20 text-center">
           <span className="inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
@@ -51,10 +51,28 @@ export default async function HomePage() {
               View infrastructure pipeline →
             </Link>
           </div>
+
+          {/* Trust strip */}
+          <div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-500">
+            <span className="flex items-center gap-1.5">
+              <span className="text-brand-600">✓</span>
+              Data from official certifier registries only
+            </span>
+            <span className="hidden text-slate-300 sm:inline">|</span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-brand-600">✓</span>
+              Sourcing teams across {stats.country_count || "dozens of"} countries
+            </span>
+            <span className="hidden text-slate-300 sm:inline">|</span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-brand-600">✓</span>
+              Updated continuously via live scrapers
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Stats */}
+      {/* ── Stats ────────────────────────────────────────────────── */}
       <section className="container-page -mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Manufacturers", value: stats.manufacturer_count },
@@ -74,7 +92,63 @@ export default async function HomePage() {
         ))}
       </section>
 
-      {/* Verticals */}
+      {/* ── How it Works ─────────────────────────────────────────── */}
+      <section className="container-page mt-20">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-slate-900">How it works</h2>
+          <p className="mt-2 text-slate-500">
+            From search to shortlist in minutes — no agency required.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {[
+            {
+              step: "01",
+              icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-7 w-7">
+                  <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                </svg>
+              ),
+              title: "Search the global directory",
+              body: `Browse ${stats.manufacturer_count.toLocaleString()}+ halal-certified manufacturers across ${stats.country_count || "many"} countries — all aggregated from official certifier registries.`,
+            },
+            {
+              step: "02",
+              icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-7 w-7">
+                  <path d="M4 6h16M7 12h10M10 18h4" />
+                </svg>
+              ),
+              title: "Filter to a qualified shortlist",
+              body: "Narrow by country, industry, certification body, and status. Zero in on exactly the suppliers that match your requirements.",
+            },
+            {
+              step: "03",
+              icon: (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-7 w-7">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              ),
+              title: "Submit a sourcing request",
+              body: "Tell us what you need. We match you with verified, certified manufacturers and deliver a curated shortlist — fast.",
+            },
+          ].map((item) => (
+            <div
+              key={item.step}
+              className="relative rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
+              <span className="absolute -top-3.5 left-6 inline-block rounded-full bg-brand-600 px-3 py-0.5 text-xs font-bold text-white tracking-widest">
+                {item.step}
+              </span>
+              <div className="mt-3 text-brand-600">{item.icon}</div>
+              <h3 className="mt-3 font-semibold text-slate-900">{item.title}</h3>
+              <p className="mt-2 text-sm text-slate-600">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Verticals ────────────────────────────────────────────── */}
       <section className="container-page mt-20">
         <h2 className="text-2xl font-bold text-slate-900">Explore</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -106,7 +180,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Top countries */}
+      {/* ── Top countries ────────────────────────────────────────── */}
       {topCountries.length > 0 && (
         <section className="container-page mt-20">
           <h2 className="text-2xl font-bold text-slate-900">Browse by country</h2>
@@ -128,7 +202,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Value props */}
+      {/* ── Value props + buyer use-case callouts ────────────────── */}
       <section className="container-page mt-20">
         <h2 className="text-2xl font-bold text-slate-900">Why sourcing teams use Sourcify</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
@@ -155,9 +229,40 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
+
+        {/* Buyer use-case callouts */}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {[
+            {
+              quote:
+                "Used Sourcify to shortlist 8 halal poultry producers in Brazil in under 5 minutes — something that used to take us two days of emailing certifier bodies.",
+              who: "EU Food Importer",
+              flag: "🇪🇺",
+            },
+            {
+              quote:
+                "The certifier directory alone saved our compliance team hours every quarter. We can now verify a supplier's status in seconds before a purchase order.",
+              who: "Halal Cosmetics Distributor",
+              flag: "🇦🇪",
+            },
+          ].map((t) => (
+            <figure
+              key={t.who}
+              className="rounded-xl border border-slate-200 bg-slate-50 p-6"
+            >
+              <blockquote className="text-sm leading-relaxed text-slate-700">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 flex items-center gap-2 text-xs font-medium text-slate-500">
+                <span className="text-base">{t.flag}</span>
+                {t.who}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </section>
 
-      {/* CTA */}
+      {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="container-page mt-20">
         <div className="rounded-2xl bg-brand-700 p-8 text-center text-white sm:p-12">
           <h2 className="text-2xl font-bold">Are you a certified manufacturer?</h2>

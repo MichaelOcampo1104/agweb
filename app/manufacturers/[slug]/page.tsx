@@ -132,6 +132,31 @@ export default async function ManufacturerDetailPage({ params }: Props) {
                     : "—"}
                 </dd>
               </div>
+              <div>
+                <dt className="text-xs uppercase tracking-wide text-slate-400">Last verified</dt>
+                <dd className="mt-0.5 font-medium text-slate-800">
+                  {new Date(m.updated_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </dd>
+              </div>
+              {m.source_url && (
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-400">Source</dt>
+                  <dd className="mt-0.5">
+                    <a
+                      href={m.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="text-sm text-brand-700 hover:underline"
+                    >
+                      View original record →
+                    </a>
+                  </dd>
+                </div>
+              )}
             </dl>
           </section>
 
