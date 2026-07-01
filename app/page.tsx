@@ -77,7 +77,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Stats ────────────────────────────────────────────────── */}
-      <section className="container-page -mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <section className="container-page relative z-10 -mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Manufacturers", value: stats.manufacturer_count },
           { label: "Countries", value: stats.country_count },
