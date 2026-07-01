@@ -50,6 +50,26 @@ function jsonLd(m: Awaited<ReturnType<typeof getManufacturerBySlug>>) {
   return JSON.stringify(data);
 }
 
+function generateBlurb(m: any) {
+  const industries = m.industries?.length > 0 ? m.industries.join(", ") : "";
+  const location = [m.city, m.country].filter(Boolean).join(", ");
+  const certBody = m.cert_body ? `certified by ${m.cert_body}` : "halal-certified";
+
+  let blurb = `${m.name} is a halal-certified supplier based in ${location}. `;
+  if (industries) {
+    blurb += `The company operates within the ${industries} sector. `;
+  }
+  if (m.cert_number) {
+    blurb += `Their certification number is ${m.cert_number}. `;
+  }
+  if (m.products?.length > 0) {
+    blurb += `They offer a range of products including: ${m.products.slice(0, 8).join(", ")}. `;
+  }
+  blurb += `They are officially ${certBody} ensuring conformity to global halal standards.`;
+
+  return blurb;
+}
+
 export default async function ManufacturerDetailPage({ params }: Props) {
   const { slug } = await params;
   const m = await getManufacturerBySlug(slug);
@@ -57,6 +77,9 @@ export default async function ManufacturerDetailPage({ params }: Props) {
 
   const related = await getRelatedManufacturers(m);
   const isFeatured = m.featured && (!m.featured_until || new Date(m.featured_until) > new Date());
+
+  const raw = m.raw_payload as { description?: string } | null;
+  const description = raw?.description;
 
   return (
     <div className="container-page py-10">
@@ -95,6 +118,14 @@ export default async function ManufacturerDetailPage({ params }: Props) {
               </p>
             </div>
           </div>
+
+          {/* About Section */}
+          <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-semibold text-slate-900">About {m.name}</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              {description || generateBlurb(m)}
+            </p>
+          </section>
 
           {/* Certification block */}
           <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
