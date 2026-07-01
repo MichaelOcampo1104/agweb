@@ -46,46 +46,35 @@ export default async function CertifiersPage() {
               <h2 className="mb-3 text-lg font-semibold text-slate-900">{country}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {byCountry.get(country)!.map((b) => (
-                  <div
+                  <Link
                     key={b.id}
-                    className="rounded-xl border border-slate-200 bg-white p-5"
+                    href={`/certifiers/${b.slug}`}
+                    className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-brand-300 hover:shadow-sm"
                   >
-                    <div className="font-semibold text-slate-900">{b.name}</div>
-                    {b.region && (
-                      <div className="mt-0.5 text-xs uppercase tracking-wide text-slate-400">
-                        {b.region}
-                      </div>
-                    )}
-                    {b.recognized_by?.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {b.recognized_by.map((r) => (
-                          <span
-                            key={r}
-                            className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
-                          >
-                            Recognized by {r}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-3 flex items-center gap-4 text-sm">
-                      {b.website && (
-                        <a
-                          href={b.website}
-                          target="_blank"
-                          rel="noopener noreferrer nofollow"
-                          className="text-brand-700 hover:underline"
-                        >
-                          Website →
-                        </a>
+                    <div>
+                      <div className="font-semibold text-slate-900 group-hover:text-brand-700">{b.name}</div>
+                      {b.region && (
+                        <div className="mt-0.5 text-xs uppercase tracking-wide text-slate-400">
+                          {b.region}
+                        </div>
                       )}
-                      {b.email && (
-                        <a href={`mailto:${b.email}`} className="text-slate-500 hover:underline">
-                          Email
-                        </a>
+                      {b.recognized_by?.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {b.recognized_by.map((r) => (
+                            <span
+                              key={r}
+                              className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
+                            >
+                              Recognized by {r}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
-                  </div>
+                    <div className="mt-4 text-xs font-medium text-brand-700">
+                      View profile &amp; suppliers →
+                    </div>
+                  </Link>
                 ))}
               </div>
             </section>

@@ -58,14 +58,19 @@ function urlEl(loc, { lastmod, changefreq = "monthly", priority = 0.6 } = {}) {
 async function main() {
   console.log("[generate-sitemap] Querying Supabase...");
 
-  const [manufacturers, infraProjects] = await Promise.all([
+  const [manufacturers, infraProjects, certifiers] = await Promise.all([
     supabase
       .from("manufacturers")
-      .select("slug, updated_at")
+      .select("slug, updated_at, country, industries")
       .order("updated_at", { ascending: false })
       .limit(5000),
     supabase
       .from("infrastructure_projects")
+      .select("slug, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(5000),
+    supabase
+      .from("certification_bodies")
       .select("slug, updated_at")
       .order("updated_at", { ascending: false })
       .limit(5000),
@@ -77,6 +82,23 @@ async function main() {
   if (infraProjects.error) {
     console.warn("[generate-sitemap] infrastructure_projects query failed:", infraProjects.error.message);
   }
+  if (certifiers.error) {
+    console.warn("[generate-sitemap] certification_bodies query failed:", certifiers.error.message);
+  }
+
+  // Extract distinct countries and industries for landing pages
+  const countrySet = new Set();
+  const industrySet = new Set();
+  const manufacturersData = manufacturers.data ?? [];
+
+  manufacturersData.forEach((m) => {
+    if (m.country) countrySet.add(m.country);
+    if (m.industries) {
+      m.industries.forEach((ind) => {
+        if (ind) industrySet.add(ind);
+      });
+    }
+  });
 
   const urls = [
     // Static pages
@@ -86,11 +108,36 @@ async function main() {
     urlEl(`${SITE_URL}/infrastructure`, { changefreq: "weekly", priority: 0.7 }),
     urlEl(`${SITE_URL}/leads/new`, { changefreq: "monthly", priority: 0.4 }),
 
+    // Industry landing pages
+    ...[...industrySet].map((ind) =>
+      urlEl(`${SITE_URL}/manufacturers/industry/${encodeURIComponent(ind)}`, {
+        changefreq: "weekly",
+        priority: 0.7,
+      }),
+    ),
+
+    // Country landing pages
+    ...[...countrySet].map((c) =>
+      urlEl(`${SITE_URL}/manufacturers/country/${encodeURIComponent(c)}`, {
+        changefreq: "weekly",
+        priority: 0.7,
+      }),
+    ),
+
     // Manufacturer detail pages
-    ...(manufacturers.data ?? []).map((m) =>
+    ...manufacturersData.map((m) =>
       urlEl(`${SITE_URL}/manufacturers/${m.slug}`, {
         lastmod: m.updated_at,
         changefreq: "monthly",
+        priority: 0.6,
+      }),
+    ),
+
+    // Certifier detail pages
+    ...(certifiers.data ?? []).map((c) =>
+      urlEl(`${SITE_URL}/certifiers/${c.slug}`, {
+        lastmod: c.updated_at,
+        changefreq: "weekly",
         priority: 0.6,
       }),
     ),

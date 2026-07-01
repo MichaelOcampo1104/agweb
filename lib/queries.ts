@@ -146,6 +146,50 @@ export async function getCertBodies(filters: { country?: string } = {}) {
   return (data ?? []) as CertBody[];
 }
 
+/** Single certifier by slug (detail page). */
+export async function getCertBodyBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("certification_bodies")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as CertBody | null) ?? null;
+}
+
+/** Manufacturers certified by a specific certification body name. */
+export async function getManufacturersByCertBody(certBodyName: string, limit = 24) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("manufacturers")
+    .select("name, slug, country, city, cert_body, industries, cert_status, featured")
+    .eq("cert_body", certBodyName)
+    .order("featured", { ascending: false })
+    .order("name", { ascending: true })
+    .limit(limit);
+  return (data ?? []) as Pick<
+    Manufacturer,
+    "name" | "slug" | "country" | "city" | "cert_body" | "industries" | "cert_status" | "featured"
+  >[];
+}
+
+/** Top industries by manufacturer count (for industry landing page nav). */
+export async function getTopIndustries(limit = 20) {
+  const supabase = await createClient();
+  const { data } = await supabase.from("manufacturers").select("industries");
+  const counts = new Map<string, number>();
+  (data ?? []).forEach((r: { industries: string[] | null }) =>
+    (r.industries ?? []).forEach((i: string) =>
+      counts.set(i, (counts.get(i) ?? 0) + 1)
+    )
+  );
+  return [...counts.entries()]
+    .map(([industry, count]) => ({ industry, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+}
+
 export async function getCertBodyCountries() {
   const supabase = await createClient();
   const { data } = await supabase
